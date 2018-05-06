@@ -23,7 +23,7 @@
 
 	$app->get('/admin', function() {
 
-		User::verifyLogin();
+		User::verifyLogin();//chama método estático de user.php
 
 		$page = new PageAdmin();
 
@@ -46,6 +46,15 @@
 		User::login($_POST["login"], $_POST["password"]);
 
 		header("Location: /admin");
+		exit;
+	});
+
+	$app->get('/admin/logout', function (){
+
+		User::logout();
+
+		header("Location: /admin/login");
+
 		exit;
 	});
 

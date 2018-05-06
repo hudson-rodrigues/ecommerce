@@ -13,7 +13,7 @@
 			$sql = new Sql();
 
 			$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
-				":LOGIN"=>$login//pode ser aqui o erro
+				":LOGIN"=>$login
 			));
 			if(count($results) === 0 ){
 				throw new \Exception("Usuário inexistente ou senha inválida.");
@@ -32,7 +32,7 @@
 				return $user;
 			}else{
 				throw new \Exception("Usuário inexistente ou senha inválida");
-				//está parando aqui
+				
 				
 			}
 		}
@@ -51,6 +51,9 @@
 				header("Location: /admin/login");
 				exit;
 			}
+		}
+		public static function logout(){
+			$_SESSION[User::SESSION] = NULL;
 		}
 	}
 
