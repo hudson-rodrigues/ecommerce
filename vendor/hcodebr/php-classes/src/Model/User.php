@@ -54,6 +54,50 @@
 		public static function logout() {
 			$_SESSION[User::SESSION] = NULL;
 		}
+
+		public static function listAll() {
+
+			$sql = new Sql();
+
+			return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson");
+		}
+		
+		public static function getPasswordHash($password)
+		{
+ 
+            return password_hash($password, PASSWORD_DEFAULT, [
+                'cost'=>12
+            ]);
+ 
+		}
+		public function save($newUser = array()) {
+
+			$sql = new Sql();
+
+			$results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", 
+				array(
+				":desperson"=>$newUser["desperson"],
+				":deslogin"=>$newUser["deslogin"],
+				":despassword"=>$newUser["despassword"],
+				":desemail"=>$newUser["desemail"],
+				":nrphone"=>$newUser["nrphone"],
+				":inadmin"=>$newUser["inadmin"]
+			));
+			//dando erro aqui, não está carregando os dados na classe
+			//$this->setData($results[0]);
+			var_dump($results[0]);
+		}
+
+		public function get($iduser) {
+			$sql = new Sql();
+
+			$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson WHERE a.iduser = :iduser)", array(
+				":iduser"=>$iduser
+			));
+			//dando erro aqui, não está carregando os dados na classe
+			var_dump($results[0]);
+			//$this->setData($results[0]);
+		}
 	}
 
 ?>

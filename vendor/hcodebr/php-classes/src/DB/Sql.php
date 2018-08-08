@@ -19,7 +19,6 @@ class Sql {
 			Sql::USERNAME,
 			Sql::PASSWORD
 		);
-
 	}
 
 	private function setParams($statement, $parameters = array())
@@ -61,7 +60,6 @@ class Sql {
 		$stmt->execute();
 
 		return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
 	}
 
 }
