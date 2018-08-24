@@ -144,14 +144,15 @@
 					throw new \Exception("Não foi possível recuperar a senha");
 				}else {
 
-					$dataRecovery = $results2[0];
-					//$iv = random_bytes(openssl_cipher_iv_lenght('aes-256-cbc'));
-					//$code = openssl_encrypt($dataRecovery['idrecovery'],'aes-256-cbc', User::SECRET, 0, $iv);
-					//$result = base64_encode($iv.$code);
-					$code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
+					$dataRecovery = $results2[0]['idrecovery'];
+					$encryption_key = base64_decode(User::SECRET);
+					$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+					$code = openssl_encrypt($dataRecovery,'aes-256-cbc',$encryption_key,0,$iv);
+					$result = base64_encode($code.'::'.$iv);
+					//$code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 
 
-					$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+					$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$result";
 
 					$mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha da Hcode Store", "forgot", array(
 						"name"=>$data["desperson"],
@@ -163,6 +164,53 @@
 					return $data;
 				}
 			}
+		}
+		public static function validForgotDecrypt($result) {
+			
+			$encryption_key = base64_decode(User::SECRET);
+			list($code, $iv) = explode('::', base64_decode($result),2);
+			$idrecovery = openssl_decrypt($code, 'aes-256-cbc', $encryption_key, 0, $iv);
+
+			$sql = new Sql();
+
+			$results = $sql->select("
+				SELECT *
+				FROM tb_userspasswordsrecoveries a
+				INNER JOIN tb_users b USING(iduser)
+				INNER JOIN tb_persons c USING(idperson)
+				WHERE a.idrecovery = :idrecovery
+				AND
+				a.dtrecovery IS NULL
+				AND
+				DATE_ADD(a.dtregister, INTERVAL 1 HOUR) >= NOW();",
+				array(
+					":idrecovery"=>$idrecovery
+			));
+			if(count($results) === 0){
+				
+				throw new \Exception("Não foi possível recuperar a senha.");
+				
+			}else {
+				return $results[0];
+			}
+		}
+
+		public static function setForgotUsed($idrecovery) {
+
+			$sql = new Sql();
+
+			$sql->query("UPDATE tb_userspasswordsrecoveries SET dtrecovery = NOW() WHERE idrecovery = :idrecovery", array(
+				":idrecovery"=>$idrecovery
+			));
+		}
+
+		public function setPassword($password) {
+			$sql = new Sql();
+
+			$sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser", array(
+				":password"=>$password,
+				":iduser"=>$this->getiduser()
+			));
 		}
 	}
 

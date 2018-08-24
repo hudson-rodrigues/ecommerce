@@ -6,7 +6,7 @@
 
 	class Mailer {
 
-		const USERNAME = "hudson_rs@outlook.com";
+		const USERNAME = "hdsnrd@gmail.com";
 		const PASSWORD = "ad100897";
 		const NAME_FROM = "Hcode Store";
 
@@ -15,7 +15,7 @@
 		public function __construct($toAddress, $toName, $subject, $tplName, $data = array()){
 
 			$config = array(
-							"tpl_dir"       => $_SERVER["DOCUMENT_ROOT"]."/views/email",
+							"tpl_dir"       => $_SERVER["DOCUMENT_ROOT"]."/views/email/",
 							"cache_dir"     => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
 							"debug"         => false // set to false to improve the speed
 			);
@@ -27,7 +27,7 @@
 			foreach ($data as $key => $value) {
 				$tpl->assign($key, $value);
 			}
-			$html = $tpl->draw("$tplName", true);
+			$html = $tpl->draw($tplName, true);
 			//Create a new PHPMailer instance
 			$this->mail = new \PHPMailer;
 			//Tell PHPMailer to use SMTP
@@ -74,8 +74,4 @@
 			return $this->mail->send();
 		}
 	}
-		
-		
-			
-
 ?>
