@@ -61,6 +61,51 @@
 			}
 			file_put_contents($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR . "categories-menu.html", implode('', $html));
 		}
+		public function getProducts($related = true){
+
+			$sql = new Sql();
+
+			if($related === true){
+				return $sql->select("SELECT * FROM tb_products WHERE idproduct IN(
+									SELECT a.idproduct
+									FROM tb_products a
+									INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
+									WHERE b.idcategory = :idcategory
+							);", [
+								'idcategory'=>$this->getidcategory()
+							]);
+			} else {
+
+				return $sql->select("SELECT * FROM tb_products WHERE idproduct NOT IN(
+									SELECT a.idproduct
+									FROM tb_products a
+									INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
+									WHERE b.idcategory = :idcategory
+							);", [
+								'idcategory'=>$this->getidcategory()
+							]);
+			}
+		}
+
+		public function addProduct(Product $Product){
+
+			$sql = new SqL();
+
+			$sql->query("INSERT INTO tb_productscategories (idcategory, idproduct) VALUES (:idcategory, :idproduct)", [
+				':idcategory'=>$this->getidcategory(),
+				':idproduct'=>$Product->getidproduct()
+			]);
+		}
+
+		public function removeProduct(Product $Product){
+
+			$sql = new SqL();
+
+			$sql->query("DELETE FROM tb_productscategories WHERE idcategory = :idcategory AND idproduct = :idproduct", [
+				':idcategory'=>$this->getidcategory(),
+				':idproduct'=>$Product->getidproduct()
+			]);
+		}
 	}
 
 ?>
