@@ -10,6 +10,8 @@
 
 		const SESSION = "User";
 		const SECRET = "HcodePhp7_Secret";
+		const ERROR = "UserError";
+		const ERROR_REGISTER = "UserErrorRegister";
 
 
 		public static function getFromSession() {
@@ -34,7 +36,7 @@
 				return false;
 			} else {
 
-				if($inadmin === true && (int)$_SESSION[User::SESSION]['inadmin'] === true){
+				if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true){
 					return true;
 				} else if($inadmin === false){
 					return true;
@@ -62,6 +64,7 @@
 			if(password_verify($password, $data["despassword"]) === true){
 				$user = new User();
 
+
 				$user->setData($data);
 
 				$_SESSION[User::SESSION] = $user->getValues();
@@ -74,11 +77,17 @@
 
 		public static function verifyLogin($inadmin = true) {
 			
-			if(User::checkLogin($inadmin)) {
+			if(!User::checkLogin($inadmin)) {
 
-				header("Location: /admin/login");
+				if($inadmin){
+					header("Location: /admin/login");
+				}
+				else {
+					header("Location: /login");
+				}
 				exit;
 			}
+			
 		}
 
 		public static function logout() {
@@ -104,9 +113,9 @@
 
 			$results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", 
 				array(
-				":desperson"=>$this->getdesperson(),
+				":desperson"=>utf8_decode($this->getdesperson()),
 				":deslogin"=>$this->getdeslogin(),
-				":despassword"=>$this->getdespassword(),
+				":despassword"=>User::getPasswordHash($this->getdespassword()),
 				":desemail"=>$this->getdesemail(),
 				":nrphone"=>$this->getnrphone(),
 				":inadmin"=>$this->getinadmin()
@@ -129,14 +138,13 @@
 
 			$results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
 				":iduser"=>$this->getiduser(),
-				":desperson"=>$this->getdesperson(),
+				":desperson"=>utf8_decode($this->getdesperson()),
 				":deslogin"=>$this->getdeslogin(),
-				":despassword"=>$this->getdespassword(),
+				":despassword"=>User::getPasswordHash($this->getdespassword()),
 				":desemail"=>$this->getdesemail(),
 				":nrphone"=>$this->getnrphone(),
 				":inadmin"=>$this->getinadmin()
 			));
-			//var_dump($results[0]);
 			$this->setData($results[0]);
 		}
 
@@ -239,6 +247,37 @@
 				":password"=>$password,
 				":iduser"=>$this->getiduser()
 			));
+		}
+
+		public static function setError($msg){
+			$_SESSION[User::Error] = $msg;
+		}
+		public static function setErrorRegister($msg){
+			$_SESSION[User::ERROR_REGISTER] = $msg;
+		}
+		public static function getError(){
+			$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
+			User::clearError();
+		}
+		public static function clearError(){
+			$_SESSION[User::ERROR] = NULL;
+		}
+		public static function getErrorRegister(){
+			$msg=(isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+			User::clearErrorRegister();
+
+			return $msg;
+		}
+		public static function clearErrorRegister(){
+			$_SESSION[User::ERROR_REGISTER] = NULL;
+		}
+		public static function checkLoginExist($login){
+			$sql = new Sql();
+			$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin",[
+
+				':deslogin'=>$login
+			]);
+			return (count($results) > 0);
 		}
 	}
 

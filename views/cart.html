@@ -96,6 +96,7 @@
                                                 <td><span class="amount">R${function="formatPrice($cart.vlsubtotal)"}</span></td>
                                             </tr>
 
+                                            <!--tem um erro acontecendo aqui, quando inicia o cart sem cep ele gera um erro -->
                                             <tr class="shipping">
                                                 <th>Frete</th>
                                                 <td>R${function="formatPrice($cart.vlfreight)"} {if="$cart.nrdays > 0"} <small>prazo de {$cart.nrdays} dia(s)</small>{/if}</td>

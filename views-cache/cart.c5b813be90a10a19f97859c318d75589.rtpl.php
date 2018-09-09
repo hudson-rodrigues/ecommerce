@@ -101,6 +101,7 @@
                                                 <td><span class="amount">R$<?php echo formatPrice($cart["vlsubtotal"]); ?></span></td>
                                             </tr>
 
+                                            <!--tem um erro acontecendo aqui, quando inicia o cart sem cep ele gera um erro -->
                                             <tr class="shipping">
                                                 <th>Frete</th>
                                                 <td>R$<?php echo formatPrice($cart["vlfreight"]); ?> <?php if( $cart["nrdays"] > 0 ){ ?> <small>prazo de <?php echo htmlspecialchars( $cart["nrdays"], ENT_COMPAT, 'UTF-8', FALSE ); ?> dia(s)</small><?php } ?></td>

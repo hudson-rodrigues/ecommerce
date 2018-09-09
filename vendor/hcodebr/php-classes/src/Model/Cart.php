@@ -204,6 +204,13 @@
 			}
 
 		}
+		public function checkZipCode(){
+		   $products = $this->getProducts();
+		   if (!count($products) > 0) {
+		        $this->setdeszipcode('');
+		        $this->setvlfreight(0);
+		   }
+		}
 		public static function formatValueToDecimal($value):float{
 			$value = str_replace('.', '', $value);
 			return str_replace(',', '.', $value);
@@ -224,7 +231,7 @@
 		}
 		
 		public function updateFreight(){
-			if($this->getdeszipcode() != ''){
+			if($this->getdeszipcode() != ""){
 				$this->setFreight($this->getdeszipcode());
 			}
 		}
@@ -239,7 +246,6 @@
 			$totals = $this->getProductsTotals();
 			$this->setvlsubtotal($totals[0]['vlprice']);
 			$this->setvltotal($totals[0]['vlprice']+$this->getvlfreight());
-
 		}
 	}
 
