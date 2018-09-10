@@ -36,6 +36,7 @@
 
 
 						$data['iduser'] = $user->getiduser();
+
 					}
 					$cart->setData($data);
 
