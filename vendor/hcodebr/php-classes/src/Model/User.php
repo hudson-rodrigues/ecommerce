@@ -256,7 +256,7 @@
 		}
 
 		public static function setError($msg){
-			$_SESSION[User::Error] = $msg;
+			$_SESSION[User::ERROR] = $msg;
 		}
 		public static function setErrorRegister($msg){
 			$_SESSION[User::ERROR_REGISTER] = $msg;
